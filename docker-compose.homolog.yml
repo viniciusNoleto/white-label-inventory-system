@@ -1,0 +1,42 @@
+services:
+  white-label-stock-system-front:
+    container_name: white-label-stock-system-front
+    user: node
+    restart: unless-stopped
+    tty: true
+    build:
+      dockerfile: ./configs/docker/node/Dockerfile.deploy
+    ports:
+      - ${APP_PORT:-80}:3000
+    networks:
+      - white-label-stock-system-network
+    depends_on:
+      white-label-stock-system-postgres:
+        condition: service_healthy
+
+  white-label-stock-system-postgres:
+    container_name: white-label-stock-system-postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-white_label_stock}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - white-label-stock-system-postgres-data:/var/lib/postgresql/data
+    networks:
+      - white-label-stock-system-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-white_label_stock}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  white-label-stock-system-network:
+    name: white-label-stock-system-network
+    driver: bridge
+
+volumes:
+  white-label-stock-system-postgres-data:
+    name: white-label-stock-system-postgres-data
