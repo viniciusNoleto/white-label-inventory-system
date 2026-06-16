@@ -3,7 +3,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import * as yup from 'yup';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form } from '@/src/components/form/Form';
 import { FormButton } from '@/src/components/form/Button';
 import { FormTextInput } from '@/src/components/form/TextInput';
@@ -19,13 +20,6 @@ import { UtilsFor } from '@/src/components/utils/For';
 import { Icon } from '@iconify/react';
 import { ActionIcon, NumberInput } from '@mantine/core';
 
-const createInventoryItemSchema = yup.object({
-  name: yup.string().default('').required('Nome é obrigatório').max(255),
-  unit_id: yup.string().required('Unidade é obrigatória'),
-  quantity: yup.number().default(0).min(0),
-  category_ids: yup.array().of(yup.string()).default([]),
-});
-
 type ComponentEntry = {
   id: string;
   name: string;
@@ -33,6 +27,15 @@ type ComponentEntry = {
 };
 
 export function useCreateInventoryItemLogicData({ onSuccess }: { onSuccess: () => void }) {
+  const { t } = useTranslation();
+
+  const createInventoryItemSchema = useMemo(() => yup.object({
+    name: yup.string().default('').required(t('forms.inventoryItem.validation.nameRequired')).max(255),
+    unit_id: yup.string().required(t('forms.inventoryItem.validation.unitRequired')),
+    quantity: yup.number().default(0).min(0),
+    category_ids: yup.array().of(yup.string()).default([]),
+  }), [t]);
+
   const createInventoryItemValidatedFormState = useValidatedFormState(createInventoryItemSchema);
   const [components, setComponents] = useState<ComponentEntry[]>([]);
 
@@ -55,8 +58,8 @@ export function useCreateInventoryItemLogicData({ onSuccess }: { onSuccess: () =
     },
     onError: (err: any) => {
       notifications.show({
-        title: 'Erro',
-        message: err?.message ?? 'Não foi possível criar o item. Tente novamente.',
+        title: t('common.notifications.errorTitle'),
+        message: err?.message ?? t('notifications.errors.createItem'),
         color: 'red',
       });
     },
@@ -84,6 +87,8 @@ export function CreateInventoryItemLogicComponent({
   logicData: ReturnType<typeof useCreateInventoryItemLogicData>;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
+
   const {
     createInventoryItemValidatedFormState: {
       field: itemField,
@@ -149,16 +154,16 @@ export function CreateInventoryItemLogicComponent({
       className="flex flex-col gap-4"
     >
       <FormTextInput
-        label="Nome"
-        placeholder="Ex: Parafuso M6"
+        label={t('forms.inventoryItem.name.label')}
+        placeholder={t('forms.inventoryItem.name.placeholder')}
         required
         {...itemField('name')}
       />
 
       <div className="grid grid-cols-2 gap-4">
         <FormSelect
-          label="Unidade"
-          placeholder="Selecione"
+          label={t('forms.inventoryItem.unit.label')}
+          placeholder={t('forms.inventoryItem.unit.placeholder')}
           data={units}
           valueField="id"
           labelField="name"
@@ -167,16 +172,16 @@ export function CreateInventoryItemLogicComponent({
         />
 
         <FormNumberInput
-          label="Quantidade inicial"
-          placeholder="0"
+          label={t('forms.inventoryItem.quantity.label')}
+          placeholder={t('forms.inventoryItem.quantity.placeholder')}
           min={0}
           {...itemField('quantity')}
         />
       </div>
 
       <FormMultiSelect
-        label="Categorias"
-        placeholder="Selecione as categorias"
+        label={t('forms.inventoryItem.categories.label')}
+        placeholder={t('forms.inventoryItem.categories.placeholder')}
         data={categories}
         valueField="id"
         labelField="name"
@@ -186,12 +191,12 @@ export function CreateInventoryItemLogicComponent({
 
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium text-gray-700">
-          Componentes
+          {t('forms.inventoryItem.components.label')}
         </span>
 
         <div className="flex gap-2 items-end">
           <FormSelect
-            placeholder="Selecionar item como componente"
+            placeholder={t('forms.inventoryItem.components.selectPlaceholder')}
             data={availableComponentItems}
             valueField="id"
             labelField="name"
@@ -201,7 +206,7 @@ export function CreateInventoryItemLogicComponent({
           />
 
           <NumberInput
-            placeholder="Qtd."
+            placeholder={t('forms.inventoryItem.components.qtyPlaceholder')}
             min={0.0001}
             step={1}
             value={componentQty}
@@ -228,7 +233,7 @@ export function CreateInventoryItemLogicComponent({
           eachKey={({ item }) => item.id}
           empty={
             <p className="text-xs text-gray-400 py-1">
-              Nenhum componente adicionado.
+              {t('forms.inventoryItem.components.empty')}
             </p>
           }
         >
@@ -270,7 +275,7 @@ export function CreateInventoryItemLogicComponent({
           onClick={onCancel}
           disabled={createInventoryItemIsPending}
         >
-          Cancelar
+          {t('common.actions.cancel')}
         </FormButton>
 
         <FormButton
@@ -278,7 +283,7 @@ export function CreateInventoryItemLogicComponent({
           color="primary"
           loading={createInventoryItemIsPending}
         >
-          Salvar
+          {t('common.actions.save')}
         </FormButton>
       </div>
     </Form>

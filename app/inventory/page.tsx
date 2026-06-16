@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Modal, Badge, NumberInput } from '@mantine/core';
 import { Icon } from '@iconify/react';
 import { UtilsCard } from '@/src/components/utils/Card';
@@ -24,6 +25,7 @@ import Link from 'next/link';
 type ModalKey = 'createUnit' | 'createCategory' | 'createItem' | 'updateQuantity' | 'build';
 
 export default function InventoryPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useImmediateState(1);
   const [modals, setModals] = useState<Partial<Record<ModalKey, boolean>>>({});
   const [editingItem, setEditingItem] = useState<IInventoryItem | null>(null);
@@ -134,11 +136,11 @@ export default function InventoryPage() {
 
           <div className="flex flex-col">
             <h1 className="text-2xl font-bold text-gray-900">
-              Inventário
+              {t('inventory.page.title')}
             </h1>
 
             <span className="text-sm text-gray-500">
-              Gerencie seus itens de estoque
+              {t('inventory.page.subtitle')}
             </span>
           </div>
         </div>
@@ -152,7 +154,7 @@ export default function InventoryPage() {
               openModal('createUnit');
             }}
           >
-            Nova Unidade
+            {t('inventory.actions.newUnit')}
           </FormButton>
 
           <FormButton
@@ -163,7 +165,7 @@ export default function InventoryPage() {
               openModal('createCategory');
             }}
           >
-            Nova Categoria
+            {t('inventory.actions.newCategory')}
           </FormButton>
 
           <FormButton
@@ -174,14 +176,14 @@ export default function InventoryPage() {
               openModal('createItem');
             }}
           >
-            Novo Item
+            {t('inventory.actions.newItem')}
           </FormButton>
         </div>
       </div>
 
       <UtilsCard className="flex flex-col gap-6">
         <FormTextInput
-          placeholder="Buscar por nome..."
+          placeholder={t('inventory.search.placeholder')}
           leftSection={
             <Icon
               icon="lucide:search"
@@ -202,12 +204,12 @@ export default function InventoryPage() {
             setPage(newPage);
             itemsRefetch();
           }}
-          emptyText="Nenhum item encontrado. Crie o primeiro item clicando em 'Novo Item'."
+          emptyText={t('inventory.table.empty')}
           columns={{
-            name: 'Nome',
-            categories: 'Categorias',
-            quantity: 'Quantidade',
-            unit: 'Unidade',
+            name: t('inventory.table.columns.name'),
+            categories: t('inventory.table.columns.categories'),
+            quantity: t('inventory.table.columns.quantity'),
+            unit: t('inventory.table.columns.unit'),
           }}
           renderCells={{
             categories: ({ item }) => (
@@ -249,16 +251,17 @@ export default function InventoryPage() {
           actions={({ item }) => [
             {
               icon: 'lucide:pencil',
-              label: 'Editar quantidade',
-              onClick: ({ item }) => openUpdateQuantity(item),
+              label: t('inventory.rowActions.editQuantity'),
+              onClick: () => openUpdateQuantity(item),
             },
             {
-              icon: 'lucide:hammer',
-              label: item.components.length > 0 ? 'Construir' : 'Construir (sem componentes)',
-              color: item.components.length > 0 ? 'primary' : 'gray',
-              onClick: ({ item }) => openBuild(item),
+              valid: item.components.length,
+              icon: 'lucide:package-plus',
+              label: t('inventory.rowActions.build'),
+              color: 'primary',
+              onClick: ({ item }: { item: IInventoryItem }) => openBuild(item),
             },
-          ]}
+          ].filter(a => a.valid === undefined || a.valid)}
         />
       </UtilsCard>
 
@@ -266,7 +269,7 @@ export default function InventoryPage() {
       <Modal
         opened={!!modals.createUnit}
         onClose={() => closeModal('createUnit')}
-        title="Nova Unidade"
+        title={t('inventory.modals.createUnit')}
         size="sm"
         centered
       >
@@ -280,7 +283,7 @@ export default function InventoryPage() {
       <Modal
         opened={!!modals.createCategory}
         onClose={() => closeModal('createCategory')}
-        title="Nova Categoria"
+        title={t('inventory.modals.createCategory')}
         size="sm"
         centered
       >
@@ -294,7 +297,7 @@ export default function InventoryPage() {
       <Modal
         opened={!!modals.createItem}
         onClose={() => closeModal('createItem')}
-        title="Novo Item de Inventário"
+        title={t('inventory.modals.createItem')}
         size="lg"
         centered
       >
@@ -308,7 +311,7 @@ export default function InventoryPage() {
       <Modal
         opened={!!modals.updateQuantity}
         onClose={() => closeModal('updateQuantity')}
-        title="Editar Quantidade"
+        title={t('inventory.modals.updateQuantity')}
         size="sm"
         centered
       >
@@ -325,7 +328,7 @@ export default function InventoryPage() {
       <Modal
         opened={!!modals.build}
         onClose={() => closeModal('build')}
-        title={`Construir: ${editingItem?.name ?? ''}`}
+        title={t('inventory.modals.build', { name: editingItem?.name ?? '' })}
         size="md"
         centered
       >

@@ -1,6 +1,6 @@
 services:
-  white-label-stock-system-front:
-    container_name: white-label-stock-system-front
+  white-label-inventory-system-front:
+    container_name: white-label-inventory-system-front
     user: node
     restart: unless-stopped
     tty: true
@@ -9,13 +9,13 @@ services:
     ports:
       - 80:3000
     networks:
-      - white-label-stock-system-network
+      - white-label-inventory-system-network
     depends_on:
-      white-label-stock-system-postgres:
+      white-label-inventory-system-postgres:
         condition: service_healthy
 
-  white-label-stock-system-postgres:
-    container_name: white-label-stock-system-postgres
+  white-label-inventory-system-postgres:
+    container_name: white-label-inventory-system-postgres
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -23,9 +23,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - white-label-stock-system-postgres-data:/var/lib/postgresql/data
+      - white-label-inventory-system-postgres-data:/var/lib/postgresql/data
     networks:
-      - white-label-stock-system-network
+      - white-label-inventory-system-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -33,10 +33,10 @@ services:
       retries: 5
 
 networks:
-  white-label-stock-system-network:
-    name: white-label-stock-system-network
+  white-label-inventory-system-network:
+    name: white-label-inventory-system-network
     driver: bridge
 
 volumes:
-  white-label-stock-system-postgres-data:
-    name: white-label-stock-system-postgres-data
+  white-label-inventory-system-postgres-data:
+    name: white-label-inventory-system-postgres-data

@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import * as yup from 'yup';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form } from '@/src/components/form/Form';
 import { FormButton } from '@/src/components/form/Button';
 import { FormNumberInput } from '@/src/components/form/Number';
@@ -13,10 +14,6 @@ import type { IInventoryItem } from '../models/InventoryItem';
 import { UtilsFor } from '@/src/components/utils/For';
 import { Badge } from '@mantine/core';
 
-const buildSchema = yup.object({
-  quantity: yup.number().default(1).min(1, 'Mínimo de 1 unidade').required('Quantidade é obrigatória'),
-});
-
 export function useBuildInventoryItemLogicData({
   editingItemId,
   onSuccess,
@@ -24,6 +21,12 @@ export function useBuildInventoryItemLogicData({
   editingItemId: string;
   onSuccess: () => void;
 }) {
+  const { t } = useTranslation();
+
+  const buildSchema = useMemo(() => yup.object({
+    quantity: yup.number().default(1).min(1, t('forms.build.validation.min')).required(t('forms.build.validation.required')),
+  }), [t]);
+
   const buildValidatedFormState = useValidatedFormState(buildSchema);
 
   const buildMutation = useMutation({
@@ -38,8 +41,8 @@ export function useBuildInventoryItemLogicData({
     },
     onError: (err: any) => {
       notifications.show({
-        title: 'Erro',
-        message: err?.message ?? 'Não foi possível construir o item.',
+        title: t('common.notifications.errorTitle'),
+        message: err?.message ?? t('notifications.errors.build'),
         color: 'red',
       });
     },
@@ -62,6 +65,8 @@ export function BuildInventoryItemLogicComponent({
   item: IInventoryItem;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
+
   const {
     buildValidatedFormState: { field: buildField, validate: validateBuild, state: buildState },
     buildMutation: { mutate: build, isLoading: buildIsPending },
@@ -87,7 +92,7 @@ export function BuildInventoryItemLogicComponent({
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-gray-600">
-          Este item não possui componentes cadastrados. Adicione componentes ao criar ou editar o item.
+          {t('forms.build.noComponentsMessage')}
         </p>
 
         <div className="flex justify-end">
@@ -96,7 +101,7 @@ export function BuildInventoryItemLogicComponent({
             color="gray"
             onClick={onCancel}
           >
-            Fechar
+            {t('common.actions.close')}
           </FormButton>
         </div>
       </div>
@@ -110,7 +115,7 @@ export function BuildInventoryItemLogicComponent({
     >
       <div className="flex flex-col gap-1">
         <span className="text-sm font-medium text-gray-700">
-          Componentes necessários por unidade
+          {t('forms.build.requiredComponentsLabel')}
         </span>
 
         <div className="flex flex-col gap-1.5 p-3 bg-gray-50 rounded">
@@ -130,14 +135,14 @@ export function BuildInventoryItemLogicComponent({
 
                   <div className="flex items-center gap-2">
                     <span className="text-gray-500">
-                      {`Necessário: ${required}`}
+                      {t('forms.build.requiredLabel', { count: required })}
                     </span>
 
                     <Badge
                       size="sm"
                       color={ok ? 'green' : 'red'}
                     >
-                      {`Disponível: ${available}`}
+                      {t('forms.build.availableLabel', { count: available })}
                     </Badge>
                   </div>
                 </div>
@@ -149,8 +154,8 @@ export function BuildInventoryItemLogicComponent({
 
       <div className="flex items-end gap-3">
         <FormNumberInput
-          label="Quantidade a construir"
-          placeholder="1"
+          label={t('forms.build.quantity.label')}
+          placeholder={t('forms.build.quantity.placeholder')}
           min={1}
           max={maxBuildable}
           required
@@ -159,7 +164,7 @@ export function BuildInventoryItemLogicComponent({
         />
 
         <p className="text-xs text-gray-500 pb-2">
-          {`Máx. possível: ${maxBuildable}`}
+          {t('forms.build.maxPossibleLabel', { count: maxBuildable })}
         </p>
       </div>
 
@@ -170,7 +175,7 @@ export function BuildInventoryItemLogicComponent({
           onClick={onCancel}
           disabled={buildIsPending}
         >
-          Cancelar
+          {t('common.actions.cancel')}
         </FormButton>
 
         <FormButton
@@ -179,7 +184,7 @@ export function BuildInventoryItemLogicComponent({
           loading={buildIsPending}
           disabled={maxBuildable === 0}
         >
-          Construir
+          {t('forms.build.submit')}
         </FormButton>
       </div>
     </Form>

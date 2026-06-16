@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 export default function Home() {
+  const { t } = useTranslation();
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6">
       <div className="flex flex-col items-center gap-8 max-w-2xl text-center">
@@ -29,14 +34,12 @@ export default function Home() {
           </h1>
 
           <p className="text-lg text-gray-500">
-            Sistema genérico de controle de estoque e inventário
+            {t('home.subtitle')}
           </p>
         </div>
 
         <p className="text-gray-600 leading-relaxed">
-          Gerencie seu inventário de forma simples e eficiente. Cadastre itens,
-          organize por categorias, controle quantidades e construa produtos compostos
-          a partir de seus componentes — tudo em um só lugar.
+          {t('home.description')}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -44,14 +47,14 @@ export default function Home() {
             href="/inventory"
             className="px-8 py-3 rounded-lg bg-primary-500 text-white font-semibold hover:bg-primary-600 transition-colors shadow-sm"
           >
-            Acessar Inventário
+            {t('home.ctaPrimary')}
           </Link>
 
           <a
             href="#features"
             className="px-8 py-3 rounded-lg border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
           >
-            Saiba mais
+            {t('home.ctaSecondary')}
           </a>
         </div>
 
@@ -78,11 +81,11 @@ export default function Home() {
             </div>
 
             <span className="font-semibold text-gray-800">
-              Categorias
+              {t('home.features.categories.title')}
             </span>
 
             <span className="text-sm text-gray-500">
-              Organize seus itens em categorias com cores personalizadas.
+              {t('home.features.categories.description')}
             </span>
           </div>
 
@@ -106,11 +109,11 @@ export default function Home() {
             </div>
 
             <span className="font-semibold text-gray-800">
-              Controle de estoque
+              {t('home.features.stock.title')}
             </span>
 
             <span className="text-sm text-gray-500">
-              Edite quantidades diretamente na tabela com precisão decimal.
+              {t('home.features.stock.description')}
             </span>
           </div>
 
@@ -133,11 +136,11 @@ export default function Home() {
             </div>
 
             <span className="font-semibold text-gray-800">
-              Construção
+              {t('home.features.build.title')}
             </span>
 
             <span className="text-sm text-gray-500">
-              Construa itens compostos consumindo seus componentes automaticamente.
+              {t('home.features.build.description')}
             </span>
           </div>
         </div>

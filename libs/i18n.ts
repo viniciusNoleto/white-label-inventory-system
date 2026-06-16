@@ -4,7 +4,9 @@ import ptBR from '@/src/locales/pt-br';
 import esMX from '@/src/locales/es-mx';
 import enUS from '@/src/locales/en-us';
 
-const savedLanguage = localStorage.getItem('cursus-front:language') ?? 'pt-br';
+export const LANGUAGE_STORAGE_KEY = 'white-label-inventory-system:language';
+
+const savedLanguage = (typeof window !== 'undefined' ? localStorage.getItem(LANGUAGE_STORAGE_KEY) : null) ?? 'pt-br';
 
 i18n
   .use(initReactI18next)

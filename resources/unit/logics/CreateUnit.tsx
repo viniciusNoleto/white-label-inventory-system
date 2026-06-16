@@ -3,18 +3,22 @@
 import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import * as yup from 'yup';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form } from '@/src/components/form/Form';
 import { FormButton } from '@/src/components/form/Button';
 import { FormTextInput } from '@/src/components/form/TextInput';
 import { useValidatedFormState } from '@/src/utils/state';
 import { createUnitService } from '../services/createUnit';
 
-const createUnitSchema = yup.object({
-  name: yup.string().default('').required('Nome é obrigatório').max(100),
-  abbreviation: yup.string().default('').required('Abreviação é obrigatória').max(20),
-});
-
 export function useCreateUnitLogicData({ onSuccess }: { onSuccess: () => void }) {
+  const { t } = useTranslation();
+
+  const createUnitSchema = useMemo(() => yup.object({
+    name: yup.string().default('').required(t('forms.unit.validation.nameRequired')).max(100),
+    abbreviation: yup.string().default('').required(t('forms.unit.validation.abbreviationRequired')).max(20),
+  }), [t]);
+
   const createUnitValidatedFormState = useValidatedFormState(createUnitSchema);
 
   const createUnitMutation = useMutation({
@@ -25,8 +29,8 @@ export function useCreateUnitLogicData({ onSuccess }: { onSuccess: () => void })
     },
     onError: (err: any) => {
       notifications.show({
-        title: 'Erro',
-        message: err?.message ?? 'Não foi possível criar a unidade. Tente novamente.',
+        title: t('common.notifications.errorTitle'),
+        message: err?.message ?? t('notifications.errors.createUnit'),
         color: 'red',
       });
     },
@@ -47,6 +51,8 @@ export function CreateUnitLogicComponent({
   logicData: ReturnType<typeof useCreateUnitLogicData>;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
+
   const {
     createUnitValidatedFormState: { field: unitField, validate: validateUnit },
     createUnitMutation: { mutate: createUnit, isPending: createUnitIsPending },
@@ -63,15 +69,15 @@ export function CreateUnitLogicComponent({
       className="flex flex-col gap-4"
     >
       <FormTextInput
-        label="Nome"
-        placeholder="Ex: Quilograma"
+        label={t('forms.unit.name.label')}
+        placeholder={t('forms.unit.name.placeholder')}
         required
         {...unitField('name')}
       />
 
       <FormTextInput
-        label="Abreviação"
-        placeholder="Ex: kg"
+        label={t('forms.unit.abbreviation.label')}
+        placeholder={t('forms.unit.abbreviation.placeholder')}
         required
         {...unitField('abbreviation')}
       />
@@ -83,7 +89,7 @@ export function CreateUnitLogicComponent({
           onClick={onCancel}
           disabled={createUnitIsPending}
         >
-          Cancelar
+          {t('common.actions.cancel')}
         </FormButton>
 
         <FormButton
@@ -91,7 +97,7 @@ export function CreateUnitLogicComponent({
           color="primary"
           loading={createUnitIsPending}
         >
-          Salvar
+          {t('common.actions.save')}
         </FormButton>
       </div>
     </Form>

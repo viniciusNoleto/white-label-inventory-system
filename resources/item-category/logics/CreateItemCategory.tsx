@@ -3,6 +3,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import * as yup from 'yup';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form } from '@/src/components/form/Form';
 import { FormButton } from '@/src/components/form/Button';
 import { FormTextInput } from '@/src/components/form/TextInput';
@@ -10,12 +12,14 @@ import { useValidatedFormState } from '@/src/utils/state';
 import { createItemCategoryService } from '../services/createItemCategory';
 import { ColorInput } from '@mantine/core';
 
-const createItemCategorySchema = yup.object({
-  name: yup.string().default('').required('Nome é obrigatório').max(100),
-  color_hex: yup.string().default('#6F1FF9').required('Cor é obrigatória'),
-});
-
 export function useCreateItemCategoryLogicData({ onSuccess }: { onSuccess: () => void }) {
+  const { t } = useTranslation();
+
+  const createItemCategorySchema = useMemo(() => yup.object({
+    name: yup.string().default('').required(t('forms.category.validation.nameRequired')).max(100),
+    color_hex: yup.string().default('#6F1FF9').required(t('forms.category.validation.colorRequired')),
+  }), [t]);
+
   const createItemCategoryValidatedFormState = useValidatedFormState(createItemCategorySchema);
 
   const createItemCategoryMutation = useMutation({
@@ -26,8 +30,8 @@ export function useCreateItemCategoryLogicData({ onSuccess }: { onSuccess: () =>
     },
     onError: (err: any) => {
       notifications.show({
-        title: 'Erro',
-        message: err?.message ?? 'Não foi possível criar a categoria. Tente novamente.',
+        title: t('common.notifications.errorTitle'),
+        message: err?.message ?? t('notifications.errors.createCategory'),
         color: 'red',
       });
     },
@@ -48,6 +52,8 @@ export function CreateItemCategoryLogicComponent({
   logicData: ReturnType<typeof useCreateItemCategoryLogicData>;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
+
   const {
     createItemCategoryValidatedFormState: {
       field: categoryField,
@@ -68,15 +74,15 @@ export function CreateItemCategoryLogicComponent({
       className="flex flex-col gap-4"
     >
       <FormTextInput
-        label="Nome"
-        placeholder="Ex: Matéria-Prima"
+        label={t('forms.category.name.label')}
+        placeholder={t('forms.category.name.placeholder')}
         required
         {...categoryField('name')}
       />
 
       <ColorInput
-        label="Cor"
-        placeholder="#6F1FF9"
+        label={t('forms.category.color.label')}
+        placeholder={t('forms.category.color.placeholder')}
         required
         value={categoryField('color_hex').value}
         onChange={(v) => setCategoryValue('color_hex', v)}
@@ -92,7 +98,7 @@ export function CreateItemCategoryLogicComponent({
           onClick={onCancel}
           disabled={createItemCategoryIsPending}
         >
-          Cancelar
+          {t('common.actions.cancel')}
         </FormButton>
 
         <FormButton
@@ -100,7 +106,7 @@ export function CreateItemCategoryLogicComponent({
           color="primary"
           loading={createItemCategoryIsPending}
         >
-          Salvar
+          {t('common.actions.save')}
         </FormButton>
       </div>
     </Form>

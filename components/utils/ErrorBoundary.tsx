@@ -1,4 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
+import i18n from '@/libs/i18n';
 
 type Props = {
   children: ReactNode;
@@ -25,11 +26,11 @@ export class ErrorBoundary extends Component<Props, State> {
       return this.props.fallback ?? (
         <div className="flex flex-col items-center justify-center h-screen gap-4 text-gray-500">
           <p className="text-lg font-semibold">
-            Algo deu errado.
+            {i18n.t('errorBoundary.title')}
           </p>
 
           <p className="text-sm">
-            Recarregue a página ou entre em contato com o suporte.
+            {i18n.t('errorBoundary.description')}
           </p>
         </div>
       );

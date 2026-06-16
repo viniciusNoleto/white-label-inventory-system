@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { UtilsFor } from '@/src/components/utils/For';
 import { FormButton, type FormButtonProps } from '../form/Button';
@@ -32,7 +33,7 @@ export function UtilsTable<T extends object, U extends Record<string, string>>({
   columns,
   rows,
   loading = false,
-  emptyText = 'Nenhum dado encontrado',
+  emptyText,
   lastPage,
   page,
   alias,
@@ -41,6 +42,7 @@ export function UtilsTable<T extends object, U extends Record<string, string>>({
   actions,
   renderCells,
 }: TableProps<T, U>) {
+  const { t } = useTranslation();
 
   const showActions = useMemo(() => actions && (typeof actions === 'function' || actions.length > 0), [actions]);
   const _columns = useMemo(() => Object.entries(columns).map(([field, label]) => ({ field, label })), [columns]);
@@ -90,7 +92,7 @@ export function UtilsTable<T extends object, U extends Record<string, string>>({
                     scope="col"
                     className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right"
                   >
-                    Ações
+                    {t('common.table.actionsColumn')}
                   </th>
                 ) : null}
               </tr>
@@ -106,7 +108,7 @@ export function UtilsTable<T extends object, U extends Record<string, string>>({
                       colSpan={colCount}
                       className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
                     >
-                      {emptyText}
+                      {emptyText ?? t('common.table.emptyDefault')}
                     </td>
                   </tr>
                 }

@@ -1,7 +1,7 @@
 include .env
 
 DOCKERFILE := docker-compose.${APP_ENV}.yml
-APP_NAME := white-label-stock-system-front
+APP_NAME := white-label-inventory-system-front
 
 f :=
 art:
